@@ -88,27 +88,29 @@ across multiple regions.`,
 
 			ctx := context.Background()
 
-			logging, err := openfeatureClient.BooleanValue(ctx, "logging", false, openfeature.EvaluationContext{})
-			if err != nil {
-				log.Warn("Feature flag error while getting logging value", "error", err)
-			} else {
-				log.Debug("Feature flag", "logging", logging)
-				if !logging {
-					logger.SetAsDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
-				}
-			}
-
-			opentelemetry, err := openfeatureClient.BooleanValue(ctx, "opentelemetry", false, openfeature.EvaluationContext{})
-			if err != nil {
-				log.Warn("Feature flag error while getting opentelemetry value", "error", err)
-			} else {
-				log.Debug("Feature flag", "opentelemetry", opentelemetry)
-				if opentelemetry {
-					if err = otel.InitializeTelemetry(ctx, log, cfg.OpenTelemetry); err != nil {
-						log.Warn("OpenTelemetry configuration failed", "error", err)
+			if openfeatureClient != nil {
+				logging, err := openfeatureClient.BooleanValue(ctx, "logging", false, openfeature.EvaluationContext{})
+				if err != nil {
+					log.Warn("Feature flag error while getting logging value", "error", err)
+				} else {
+					log.Debug("Feature flag", "logging", logging)
+					if !logging {
+						logger.SetAsDefault(slog.New(slog.NewTextHandler(io.Discard, nil)))
 					}
-					if cfg.OpenTelemetry.Logs.Enabled {
-						// TODO:Configure slog with Otel handler.
+				}
+
+				opentelemetry, err := openfeatureClient.BooleanValue(ctx, "opentelemetry", false, openfeature.EvaluationContext{})
+				if err != nil {
+					log.Warn("Feature flag error while getting opentelemetry value", "error", err)
+				} else {
+					log.Debug("Feature flag", "opentelemetry", opentelemetry)
+					if opentelemetry {
+						if err = otel.InitializeTelemetry(ctx, log, cfg.OpenTelemetry); err != nil {
+							log.Warn("OpenTelemetry configuration failed", "error", err)
+						}
+						if cfg.OpenTelemetry.Logs.Enabled {
+							// TODO:Configure slog with Otel handler.
+						}
 					}
 				}
 			}
@@ -149,17 +151,6 @@ across multiple regions.`,
 
 	return cmd
 }
-
-// // newVersionCommand creates a version command
-// func newVersionCommand() *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "version",
-// 		Short: "Print the version information",
-// 		Run: func(cmd *cobra.Command, args []string) {
-// 			fmt.Printf("e2c version %s\n", version.GetVersion())
-// 		},
-// 	}
-// }
 
 // Execute executes the root command
 func Execute() {
