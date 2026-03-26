@@ -7,6 +7,7 @@ import (
 
 	"github.com/nlamirault/e2c/internal/utils"
 	"github.com/nlamirault/e2c/internal/version"
+)
 
 func newVersionCommand() *cobra.Command {
 	return &cobra.Command{
