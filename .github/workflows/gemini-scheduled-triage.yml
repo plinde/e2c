@@ -1,4 +1,4 @@
-name: '📋 Gemini Scheduled Issue Triage'
+name: '📋 Gemini / Issue Triage'
 
 on:
   schedule:

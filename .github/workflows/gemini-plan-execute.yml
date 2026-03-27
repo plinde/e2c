@@ -1,4 +1,4 @@
-name: '🧙 Gemini Plan Execution'
+name: '🧙 Gemini / Plan Execution'
 
 on:
   workflow_call:
