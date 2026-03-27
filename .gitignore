@@ -41,3 +41,6 @@ _testmain.go
 dist
 build
 e2c_*
+
+.gemini/
+gha-creds-*.json
