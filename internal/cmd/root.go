@@ -25,6 +25,7 @@ func NewRootCommand(log *slog.Logger) *cobra.Command {
 		region    string
 		logFormat string
 		logLevel  string
+		logFile   string
 	)
 
 	cmd := &cobra.Command{
@@ -37,7 +38,7 @@ It provides a simple, intuitive interface for managing EC2 instances
 across multiple regions.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Configure logging if requested via flags
-			if logFormat != "" || logLevel != "" {
+			if logFormat != "" || logLevel != "" || logFile != "" {
 				logConfig := logger.NewConfig()
 
 				// Set format if specified
@@ -48,6 +49,11 @@ across multiple regions.`,
 				// Set level if specified
 				if logLevel != "" {
 					logConfig.Level = logger.ParseLevel(logLevel)
+				}
+
+				// Set log file if specified
+				if logFile != "" {
+					logConfig.LogFile = logFile
 				}
 
 				// Create and set the new logger
@@ -87,6 +93,7 @@ across multiple regions.`,
 	cmd.PersistentFlags().StringVar(&region, "region", "", "AWS region to use")
 	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "", "set log format (json, text)")
 	cmd.PersistentFlags().StringVar(&logLevel, "log-level", "", "set logging level (debug, info, warn, error)")
+	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "write logs to a file (overrides autodetected TTY discard)")
 
 	// Add version command
 	cmd.AddCommand(newVersionCommand())

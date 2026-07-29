@@ -5,12 +5,14 @@ package logger
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/lmittmann/tint"
+	"golang.org/x/term"
 )
 
 // Level represents the log level
@@ -54,7 +56,9 @@ type Config struct {
 	// Format is the output format (text, json)
 	Format Format
 	// Output is the destination for logs (defaults to stdout)
-	Output *os.File
+	Output io.Writer
+	// LogFile is the path to write logs to (if set, takes precedence over Output)
+	LogFile string
 	// AddSource adds the source file and line number to log messages
 	AddSource bool
 }
@@ -67,6 +71,22 @@ func NewConfig() *Config {
 		Output:    os.Stdout,
 		AddSource: true,
 	}
+}
+
+// resolveOutput determines the log output based on configuration
+func resolveOutput(cfg *Config) io.Writer {
+	if cfg.LogFile != "" {
+		f, err := os.OpenFile(cfg.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to open log file %q: %v\n", cfg.LogFile, err)
+		} else {
+			return f
+		}
+	}
+	if cfg.Output == os.Stdout && term.IsTerminal(int(os.Stdout.Fd())) {
+		return io.Discard
+	}
+	return cfg.Output
 }
 
 // New creates a new logger with the given configuration
@@ -92,15 +112,17 @@ func New(cfg *Config) *slog.Logger {
 		fmt.Fprintf(os.Stderr, "Unknown log level %q, defaulting to info\n", cfg.Level)
 	}
 
+	output := resolveOutput(cfg)
+
 	// Set up handler based on format
 	var handler slog.Handler
 	if cfg.Format == JSONFormat {
-		handler = slog.NewJSONHandler(cfg.Output, &slog.HandlerOptions{
+		handler = slog.NewJSONHandler(output, &slog.HandlerOptions{
 			Level:     level,
 			AddSource: cfg.AddSource,
 		})
 	} else {
-		handler = tint.NewHandler(cfg.Output, &tint.Options{
+		handler = tint.NewHandler(output, &tint.Options{
 			Level:      level,
 			AddSource:  cfg.AddSource,
 			TimeFormat: time.RFC3339,
