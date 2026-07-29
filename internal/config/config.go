@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+
+	"github.com/nlamirault/e2c/internal/color"
 )
 
 // Config represents the application configuration
@@ -26,6 +28,11 @@ type AWSConfig struct {
 // UIConfig holds UI-specific configuration
 type UIConfig struct {
 	Compact bool `mapstructure:"compact"`
+	// Theme selects a built-in color scheme (see internal/color.Themes).
+	Theme string `mapstructure:"theme"`
+	// Colors overrides individual colors of the selected theme, keyed by the
+	// names returned by color.ColorNames().
+	Colors map[string]string `mapstructure:"colors"`
 }
 
 // LoadConfig loads the configuration from file and environment variables
@@ -35,7 +42,7 @@ func LoadConfig(log *slog.Logger) (*Config, error) {
 	viper.SetDefault("aws.refresh_interval", "30s")
 	viper.SetDefault("aws.profile", "")
 	viper.SetDefault("ui.compact", false)
-
+	viper.SetDefault("ui.theme", color.DefaultTheme)
 
 	// Config file name and paths
 	viper.SetConfigName("config")
@@ -79,11 +86,23 @@ func LoadConfig(log *slog.Logger) (*Config, error) {
 }
 
 // Override allows command-line flags to override config
-func (c *Config) Override(profile, region string) {
+func (c *Config) Override(profile, region, theme string) {
 	if profile != "" {
 		c.AWS.Profile = profile
 	}
 	if region != "" {
 		c.AWS.DefaultRegion = region
 	}
+	if theme != "" {
+		c.UI.Theme = theme
+	}
+}
+
+// ApplyTheme selects the configured built-in theme and applies any per-color
+// overrides on top of it. Called before the UI is built.
+func (c *Config) ApplyTheme() error {
+	if err := color.SetTheme(c.UI.Theme); err != nil {
+		return err
+	}
+	return color.ApplyOverrides(c.UI.Colors)
 }

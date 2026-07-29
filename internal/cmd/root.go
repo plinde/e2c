@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/nlamirault/e2c/internal/aws"
+	"github.com/nlamirault/e2c/internal/color"
 	"github.com/nlamirault/e2c/internal/config"
 	"github.com/nlamirault/e2c/internal/logger"
 	"github.com/nlamirault/e2c/internal/ui"
@@ -23,6 +25,7 @@ func NewRootCommand(log *slog.Logger) *cobra.Command {
 		cfgFile   string
 		profile   string
 		region    string
+		theme     string
 		logFormat string
 		logLevel  string
 	)
@@ -62,7 +65,12 @@ across multiple regions.`,
 			}
 
 			// Override with CLI flags
-			cfg.Override(profile, region)
+			cfg.Override(profile, region, theme)
+
+			// Resolve the color scheme before anything renders
+			if err := cfg.ApplyTheme(); err != nil {
+				return fmt.Errorf("failed to apply theme: %w", err)
+			}
 
 			// Create AWS EC2 client
 			ec2Client, err := aws.NewEC2Client(log, cfg.AWS.DefaultRegion, cfg.AWS.Profile)
@@ -85,6 +93,8 @@ across multiple regions.`,
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/e2c/config.yaml)")
 	cmd.PersistentFlags().StringVar(&profile, "profile", "", "AWS profile to use")
 	cmd.PersistentFlags().StringVar(&region, "region", "", "AWS region to use")
+	cmd.PersistentFlags().StringVar(&theme, "theme", "",
+		fmt.Sprintf("color theme to use (%s) (default %q)", strings.Join(color.ThemeNames(), ", "), color.DefaultTheme))
 	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "", "set log format (json, text)")
 	cmd.PersistentFlags().StringVar(&logLevel, "log-level", "", "set logging level (debug, info, warn, error)")
 
