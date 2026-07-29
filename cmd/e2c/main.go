@@ -25,6 +25,11 @@ func main() {
 		logConfig.Format = logger.ParseFormat(envFormat)
 	}
 
+	// Set log file from environment variable
+	if envLogFile := os.Getenv("E2C_LOG_FILE"); envLogFile != "" {
+		logConfig.LogFile = envLogFile
+	}
+
 	// Create and set default logger
 	log := logger.New(logConfig)
 	logger.SetAsDefault(log)
