@@ -13,9 +13,9 @@ aws:
   profile: ""
 
 ui:
-  # Color theme: nord (default) or gruvbox.
+  # Color theme: gruvbox (default) or nord.
   # Overridden by --theme. An unknown name is an error, not a silent fallback.
-  theme: nord
+  theme: gruvbox
 
   # Optionally override individual colors of the selected theme.
   # Values are "#rrggbb" or a color name. Valid keys:

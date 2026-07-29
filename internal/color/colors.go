@@ -13,7 +13,11 @@ import (
 )
 
 // DefaultTheme is the theme used when none is configured.
-const DefaultTheme = "nord"
+//
+// Fork note: upstream defaults to "nord". This fork defaults to "gruvbox" to
+// match the rest of the local TUI set (abtop, e1s). Everything else about theme
+// handling is upstream-identical, so keep this the only line that differs.
+const DefaultTheme = "gruvbox"
 
 // Colors represents the colors used in the application
 type Colors struct {

@@ -40,7 +40,7 @@ e2c
 e2c --region eu-west-1
 
 # Start with a specific color theme
-e2c --theme gruvbox
+e2c --theme nord
 
 # Show help
 e2c --help
@@ -79,8 +79,8 @@ aws:
   refresh_interval: 30s
 
 ui:
-  # Color theme: nord (default) or gruvbox
-  theme: nord
+  # Color theme: gruvbox (default) or nord
+  theme: gruvbox
 
   # Optionally override individual colors of the selected theme
   # colors:
@@ -92,7 +92,7 @@ ui:
 
 ### Themes
 
-Built-in themes are `nord` (default) and `gruvbox`. Select one with the
+Built-in themes are `gruvbox` (default) and `nord`. Select one with the
 `ui.theme` config key or the `--theme` flag, which takes precedence.
 
 Any color of the selected theme can be overridden individually under
