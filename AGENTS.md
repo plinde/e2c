@@ -56,13 +56,23 @@ lines that differ from an upstreamable version.
 
 ```bash
 go build ./... && go vet ./... && gofmt -l . && go test ./...
-make install    # builds and copies to $(go env GOPATH)/bin
+make install
+```
+
+The Makefile installs to `INSTALL_DIR = $(GOBIN)`, falling back to
+`$(GOPATH)/bin`. **Those are not the same directory under asdf** — here `GOBIN`
+is `~/.asdf/installs/golang/<ver>/bin` while `GOPATH` is
+`~/.asdf/installs/golang/<ver>/packages`, so reaching for `$(go env GOPATH)/bin`
+gets you a path that does not exist. Resolve it the way the Makefile does:
+
+```bash
+E2C_BIN="$(go env GOBIN)"; [ -n "$E2C_BIN" ] || E2C_BIN="$(go env GOPATH)/bin"
 ```
 
 ⚠ **After every `make install`, re-sign the binary**:
 
 ```bash
-codesign --force --sign - "$(go env GOPATH)/bin/e2c"
+codesign --force --sign - "$E2C_BIN/e2c"
 ```
 
 `make install` `cp`s over the existing binary path. macOS keeps the previous
