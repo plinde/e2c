@@ -39,6 +39,9 @@ e2c
 # Start with a specific AWS region
 e2c --region eu-west-1
 
+# Start with a specific color theme
+e2c --theme nord
+
 # Show help
 e2c --help
 ```
@@ -76,9 +79,29 @@ aws:
   refresh_interval: 30s
 
 ui:
+  # Color theme: gruvbox (default) or nord
+  theme: gruvbox
+
+  # Optionally override individual colors of the selected theme
+  # colors:
+  #   running: "#b8bb26"
+
   # Compact mode reduces whitespace in the UI
   compact: false
 ```
+
+### Themes
+
+Built-in themes are `gruvbox` (default) and `nord`. Select one with the
+`ui.theme` config key or the `--theme` flag, which takes precedence.
+
+Any color of the selected theme can be overridden individually under
+`ui.colors`. Values are `#rrggbb` or a color name. The keys are `background`,
+`foreground`, `border`, `title`, `selected`, `header_fg`, `header_bg`,
+`running`, `stopped`, `pending`, `error`, `highlight` and `secondary`.
+
+An unknown theme name, an unknown color key, or an unparseable color value is
+reported as an error at startup rather than silently ignored.
 
 ### Environment Variables
 

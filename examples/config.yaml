@@ -13,10 +13,17 @@ aws:
   profile: ""
 
 ui:
-  # UI theme (dark or light)
-  theme: dark
+  # Color theme: gruvbox (default) or nord.
+  # Overridden by --theme. An unknown name is an error, not a silent fallback.
+  theme: gruvbox
+
+  # Optionally override individual colors of the selected theme.
+  # Values are "#rrggbb" or a color name. Valid keys:
+  #   background, foreground, border, title, selected, header_fg, header_bg,
+  #   running, stopped, pending, error, highlight, secondary
+  # colors:
+  #   running: "#b8bb26"
+  #   stopped: "#fb4934"
 
   # Compact mode reduces whitespace in the UI
   compact: false
-
-  # The UI uses the Nord color theme by default
