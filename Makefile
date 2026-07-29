@@ -9,6 +9,9 @@ BUILD_DIR=build
 GO_FILES=$(shell find . -name "*.go" -type f -not -path "./vendor/*")
 GOARCH=$(shell go env GOARCH)
 GOOS=$(shell go env GOOS)
+GOBIN=$(shell go env GOBIN)
+GOPATH=$(shell go env GOPATH)
+INSTALL_DIR=$(if $(GOBIN),$(GOBIN),$(GOPATH)/bin)
 VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS=-ldflags "-X github.com/nlamirault/e2c/internal/version.Version=$(VERSION)"
 
@@ -56,8 +59,9 @@ fmt: ## Format the code
 	@gofmt -w -s $(GO_FILES)
 
 install: build ## Install the binary
-	@echo "$(COLOR_GREEN)Installing $(BINARY_NAME)...$(COLOR_RESET)"
-	@cp $(BUILD_DIR)/$(BINARY_NAME) $(GOPATH)/bin/
+	@echo "$(COLOR_GREEN)Installing $(BINARY_NAME) to $(INSTALL_DIR)...$(COLOR_RESET)"
+	@mkdir -p $(INSTALL_DIR)
+	@cp $(BUILD_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/
 
 run: ## Run the application
 	@echo "$(COLOR_GREEN)Running $(BINARY_NAME)...$(COLOR_RESET)"
